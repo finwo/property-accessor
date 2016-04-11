@@ -4,6 +4,14 @@ namespace Finwo\PropertyAccessor;
 
 class PropertyAccessor
 {
+    /**
+     * @param        $subject
+     * @param string $path
+     * @param string $pathSplit
+     *
+     * @return array|mixed|null
+     * @throws \Exception
+     */
     public function get($subject, $path = '', $pathSplit = '|')
     {
         //split the path
@@ -14,6 +22,14 @@ class PropertyAccessor
             return $this->getArrayProperty($subject, $path);
         }
 
+        //throw error if needed
+        if (!is_object($subject)) {
+            throw new \Exception(sprintf(
+                'Subject must be an array or object, %s given',
+                gettype($subject)
+            ));
+        }
+
         //all methods failed, throw exception
         throw new \Exception(sprintf(
             'Required property "%s" of class %s is missing in data',
@@ -22,7 +38,16 @@ class PropertyAccessor
         ));
     }
 
-    public function set($subject, $path = '', $value, $pathSplit = '|')
+    /**
+     * @param        $subject
+     * @param string $path
+     * @param        $value
+     * @param string $pathSplit
+     *
+     * @return PropertyAccessor
+     * @throws \Exception
+     */
+    public function set(&$subject, $path = '', $value, $pathSplit = '|')
     {
         //split the path
         $path = explode($pathSplit, $path);
@@ -30,6 +55,14 @@ class PropertyAccessor
         //try array
         if (is_array($subject)) {
             return $this->setArrayProperty($subject, $path, $value);
+        }
+
+        //throw error if needed
+        if (!is_object($subject)) {
+            throw new \Exception(sprintf(
+                'Subject must be an array or object, %s given',
+                gettype($subject)
+            ));
         }
 
         //all methods failed, throw exception
