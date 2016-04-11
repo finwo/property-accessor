@@ -8,7 +8,9 @@
     ],
     "minimum-stability": "stable",
     "autoload": {
-        "psr-4": { "Finwo\\PropertyAccessor\\": "src" }
+        "psr-4": {
+            "Finwo\\PropertyAccessor\\": "src/"
+        }
     },
     "require": {
 
