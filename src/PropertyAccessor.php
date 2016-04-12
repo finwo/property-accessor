@@ -53,17 +53,17 @@ class PropertyAccessor
             ));
         }
 
-        // try generic getter
+        // try magic getter
         if (method_exists($subject, 'get')) {
             return $subject->get($path);
         }
 
-        // try generic hidden getter
+        // try magic hidden getter
         if (method_exists($subject, '__get')) {
             return $subject->__get($path);
         }
 
-        // try fetching directly
+        // try getting directly
         $rc = new \ReflectionObject($subject);
         foreach ($rc->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             if ($property->getName() == $path) {
@@ -105,6 +105,49 @@ class PropertyAccessor
                 'Subject must be an array or object, %s given',
                 gettype($subject)
             ));
+        }
+
+        $camelized = $this->camelize($path);
+
+        // try the default setter
+        if (method_exists($subject, $method = sprintf("set%s", $camelized))) {
+            call_user_func(array(
+                $subject,
+                $method,
+                $value
+            ));
+            return $this;
+        }
+
+        // try less-common setter
+        if (method_exists($subject, $method = lcfirst($camelized))) {
+            call_user_func(array(
+                $subject,
+                $method,
+                $value
+            ));
+            return $this;
+        }
+
+        // try magic getter
+        if (method_exists($subject, 'set')) {
+            $subject->set($path, $value);
+            return $this;
+        }
+
+        // try magic hidden setter
+        if (method_exists($subject, '__set')) {
+            $subject->__set($path, $value);
+            return $this;
+        }
+
+        // try getting directly
+        $rc = new \ReflectionObject($subject);
+        foreach ($rc->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+            if ($property->getName() == $path) {
+                $subject->{$path} = $value;
+                return $this;
+            }
         }
 
         // all methods failed, throw exception
