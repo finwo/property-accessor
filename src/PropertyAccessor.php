@@ -24,7 +24,7 @@ class PropertyAccessor
         // try array for legacy mapper
         if (is_array($subject)) {
             $path = explode($pathSplit, $path);
-            return $this->getArrayProperty($subject, $path);
+            return $this->getArrayProperty($subject, $path, $pathSplit);
         }
 
         // throw error if needed
@@ -73,12 +73,12 @@ class PropertyAccessor
 
         // all methods failed, throw exception
         if ($this->getDebug()) {
-            return '#ERROR';
+            return null;
         }
         throw new \Exception(sprintf(
-            'Required property "%s" of class %s is missing in data',
-            '',
-            ''
+            'The property "%s" from object of class %s was inaccessible.',
+            $path,
+            get_class($subject)
         ));
     }
 
@@ -152,24 +152,28 @@ class PropertyAccessor
 
         // all methods failed, throw exception
         if ($this->getDebug()) {
-            return '#ERROR';
+            return $this;
         }
 
         throw new \Exception(sprintf(
-            'Required property "%s" of class %s is missing in data',
-            '',
-            ''
+            'The property "%s" from object of class %s was inaccessible.',
+            $path,
+            get_class($subject)
         ));
     }
 
-    protected function getArrayProperty($input = array(), $path = array())
+    protected function getArrayProperty($input = array(), $path = array(), $splitChar = '|')
     {
         $target = $input;
         foreach($path as $key) {
             if(isset($target[$key])) {
                 $target = $target[$key];
             } else {
-                return null;
+                if ($this->debug) return null;
+                throw new \Exception(sprintf(
+                    'The property "%s" from array was inaccessible.',
+                    implode($splitChar, $path)
+                ));
             }
         }
         return $target;
