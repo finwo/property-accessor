@@ -19,7 +19,7 @@ class PropertyAccessor
      * @return array|mixed|null
      * @throws \Exception
      */
-    public function get($subject, $path = '', $pathSplit = '|')
+    public function get(&$subject, $path = '', $pathSplit = '|')
     {
         // try array for legacy mapper
         if (is_array($subject)) {
@@ -33,6 +33,16 @@ class PropertyAccessor
                 'Subject must be an array or object, %s given',
                 gettype($subject)
             ));
+        }
+
+        // handle in-depth request
+        if (strpos($path, $pathSplit)) {
+            $target = $subject;
+            $path = explode($pathSplit, $path);
+            foreach($path as $part) {
+                $target = $this->get($target, $part, $pathSplit);
+            }
+            return $target;
         }
 
         $camelized = $this->camelize($path);
@@ -105,6 +115,17 @@ class PropertyAccessor
                 'Subject must be an array or object, %s given',
                 gettype($subject)
             ));
+        }
+
+        // handle in-depth request
+        if (strpos($path, $pathSplit)) {
+            $target = &$subject;
+            $path = explode($pathSplit, $path);
+            $last = array_pop($path);
+            foreach($path as $part) {
+                $target = &$this->get($target, $part, $pathSplit);
+            }
+            return $this->set($target, $last, $value, $pathSplit);
         }
 
         $camelized = $this->camelize($path);
