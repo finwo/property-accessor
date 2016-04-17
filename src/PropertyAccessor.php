@@ -144,9 +144,10 @@ class PropertyAccessor
         if (method_exists($subject, $method = lcfirst($camelized))) {
             call_user_func(array(
                 $subject,
-                $method,
+                $method
+            ),
                 $value
-            ));
+            );
             return $this;
         }
 
