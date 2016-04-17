@@ -223,6 +223,24 @@ class PropertyAccessor
         return str_replace(' ','',ucwords($output));
     }
 
+    protected function mergeArrays(&$original, $new)
+    {
+        $source = &$original;
+
+        foreach($new as $key => $value) {
+            if(is_array($value)) {
+                // nest deeper
+                if(!isset($source[$key])) {
+                    $source[$key] = array();
+                }
+                $this->mergeArrays($source[$key], $value);
+            } else {
+                // overwrite
+                $source[$key] = $value;
+            }
+        }
+    }
+
     protected function getDebug()
     {
         return $this->debug;
