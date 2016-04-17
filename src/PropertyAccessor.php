@@ -134,9 +134,10 @@ class PropertyAccessor
         if (method_exists($subject, $method = sprintf("set%s", $camelized))) {
             call_user_func(array(
                 $subject,
-                $method,
+                $method
+            ),
                 $value
-            ));
+            );
             return $this;
         }
 
