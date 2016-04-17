@@ -223,7 +223,7 @@ class PropertyAccessor
         return str_replace(' ','',ucwords($output));
     }
 
-    protected function mergeArrays(&$original, $new)
+    public function mergeArrays(&$original, $new)
     {
         $source = &$original;
 
