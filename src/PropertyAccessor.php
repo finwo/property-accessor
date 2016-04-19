@@ -40,7 +40,7 @@ class PropertyAccessor
             $target = $subject;
             $path = explode($pathSplit, $path);
             foreach($path as $part) {
-                $target = $this->get($target, $part, $pathSplit);
+                $target = &$this->get($target, $part, $pathSplit);
             }
             return $target;
         }
@@ -200,6 +200,57 @@ class PropertyAccessor
             }
         }
         return $target;
+    }
+
+    public function remove(&$input, $path, $splitChar = '|')
+    {
+        // Do nothing if we can't use the property
+        if (!is_array($input) && !is_object($input)) {
+            return;
+        }
+
+        // Convert the path to something useful
+        if (!is_array($path)) {
+
+            // Do nothing if we can't use the path
+            if (!is_string($path)) {
+                return;
+            }
+
+            // Split by the split character
+            $path = explode($splitChar, $path);
+        }
+
+        // Fetch the last key
+        $lastKey = array_pop($path);
+
+        // Fetch the parent
+        if (count($path)) {
+            $target = &$this->get($input, implode('|', $path), '|');
+        } else {
+            $target = &$input;
+        }
+
+        // Handle if the target is an array
+        if (is_array($target)) {
+            if (!isset($target[$lastKey])) {
+                return;
+            }
+            unset($target[$lastKey]);
+            return;
+        }
+
+        // Handle if the target is an object
+        if (is_object($target)) {
+            if (!isset($target->{$lastKey})) {
+                return;
+            }
+            unset($target->{$lastKey});
+            return;
+        }
+
+        // We're not compatible with this type
+        return;
     }
 
     protected function setArrayProperty(&$input = array(), $path = array(), $value)
