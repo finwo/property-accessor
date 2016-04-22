@@ -101,7 +101,7 @@ class PropertyAccessor
      * @return PropertyAccessor
      * @throws \Exception
      */
-    public function set(&$subject, $path = '', $value, $pathSplit = '|')
+    public function set(&$subject, $path = '', &$value, $pathSplit = '|')
     {
         // try array for legacy mapper
         if (is_array($subject)) {
@@ -168,7 +168,7 @@ class PropertyAccessor
         $rc = new \ReflectionObject($subject);
         foreach ($rc->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             if ($property->getName() == $path) {
-                $subject->{$path} = $value;
+                $subject->{$path} = &$value;
                 return $this;
             }
         }
@@ -187,10 +187,10 @@ class PropertyAccessor
 
     protected function getArrayProperty($input = array(), $path = array(), $splitChar = '|')
     {
-        $target = $input;
+        $target = &$input;
         foreach($path as $key) {
             if(isset($target[$key])) {
-                $target = $target[$key];
+                $target = &$target[$key];
             } else {
                 if ($this->debug) return null;
                 throw new \Exception(sprintf(
@@ -253,7 +253,7 @@ class PropertyAccessor
         return;
     }
 
-    protected function setArrayProperty(&$input = array(), $path = array(), $value)
+    protected function setArrayProperty(&$input = array(), $path = array(), &$value)
     {
         $target = &$input;
         foreach($path as $key) {
