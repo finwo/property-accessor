@@ -24,7 +24,7 @@ class PropertyAccessor
     public function getSafe(&$subject, $path = '', $pathSplit = '|', $default = null, $options = array())
     {
         $result = $this->get($subject, $path, $pathSplit);
-        if (in_array($result, $options) || is_null($result)) {
+        if ( !in_array($result, $options) || is_null($result) ) {
             $result = &$default;
         }
         return $result;
