@@ -15,6 +15,25 @@ class PropertyAccessor
      * @param        $subject
      * @param string $path
      * @param string $pathSplit
+     * @param null   $default
+     * @param array  $options
+     *
+     * @return array|mixed|null
+     * @throws \Exception
+     */
+    public function getSafe(&$subject, $path = '', $pathSplit = '|', $default = null, $options = array())
+    {
+        $result = $this->get($subject, $path, $pathSplit);
+        if (in_array($result, $options) || is_null($result)) {
+            $result = &$default;
+        }
+        return $result;
+    }
+
+    /**
+     * @param        $subject
+     * @param string $path
+     * @param string $pathSplit
      *
      * @return array|mixed|null
      * @throws \Exception
