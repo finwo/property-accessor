@@ -21,12 +21,22 @@ class PropertyAccessor
      * @return array|mixed|null
      * @throws \Exception
      */
-    public function getSafe(&$subject, $path = '', $pathSplit = '|', $default = null, $options = array())
+    public function getSafe(&$subject, $path = '', $pathSplit = '|', &$default = null, $options = array())
     {
+        // Fetch
         $result = $this->get($subject, $path, $pathSplit);
-        if ( !in_array($result, $options) || is_null($result) ) {
+
+        // Filter down to options
+        if (!is_null($options) && count($options) && !in_array($result, $options)) {
             $result = &$default;
         }
+
+        // Make sure there is a value
+        if (is_null($result)) {
+            $result = &$default;
+        }
+
+        // And return offcourse
         return $result;
     }
 
